@@ -29,10 +29,7 @@ type Findings []Finding
 
 var (
 	repositories = [][]string{
-		{"logging-platform-dev2/embulk", "latest"},
-		{"custom-fluent-bit", "latest"},
-		{"nginx/socket", "latest"},
-		{"nginx", "latest"},
+		{"scantest", "latest"},
 	}
 )
 
