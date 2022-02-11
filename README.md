@@ -2,6 +2,8 @@
 
 ecrscan is golang package to scan AWS ECR Repositories and get vulunerability information.
 
+[![GitHub Workflow Status](https://img.shields.io/github/workflow/status/jedipunkz/ecrscan/Go-Lint?style=flat-square)](https://github.com/jedipunkz/ecrscan/actions?query=workflow%3AGo-Lint)
+
 ## Requirement
 
 - install go 1.17.x or later
