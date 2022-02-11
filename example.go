@@ -8,6 +8,10 @@ import (
 
 func main() {
 	e := myecr.Ecr{}
+	e.Repositories = [][]string{
+		{"scantest", "latest"},
+	}
+	e.Resion = "ap-northeast-1"
 	etcFinding, findings, _ := e.ListFindings()
 
 	for _, f := range findings {

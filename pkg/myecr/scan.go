@@ -9,11 +9,13 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr"
 )
 
-//Ecr is struct for communicating to ecr api
+//Ecr is struct for communicating to aws ecr api
 type Ecr struct {
 	client           *ecr.ECR
 	listFindings     *ecr.DescribeImageScanFindingsOutput
 	input            *ecr.DescribeImageScanFindingsInput
+	Repositories     [][]string
+	Resion           string
 	OutputFinding    Finding
 	OutputFindings   Findings
 	EtcOutputFinding EtcFinding
@@ -38,26 +40,16 @@ type Finding struct {
 // Findings is struct for Vulunerability Findings
 type Findings []Finding
 
-var (
-	repositories = [][]string{
-		{"scantest", "latest"},
-	}
-)
-
-const (
-	region = "ap-northeast-1"
-)
-
 // ListFindings is func
 func (e *Ecr) ListFindings() (EtcFinding, Findings, error) {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
-			Region: aws.String(region),
+			Region: aws.String(e.Resion),
 		},
 	}))
 	e.client = ecr.New(sess)
 
-	for _, r := range repositories {
+	for _, r := range e.Repositories {
 		e.input = &ecr.DescribeImageScanFindingsInput{
 			ImageId: &ecr.ImageIdentifier{
 				ImageTag: aws.String(r[1]),
