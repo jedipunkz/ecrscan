@@ -55,4 +55,3 @@ func main() {
 ## Author
 
 [jedipunkz 🚀](https://twitter.com/jedipunkz)
-
