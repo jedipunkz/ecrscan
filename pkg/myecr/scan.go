@@ -11,37 +11,36 @@ import (
 
 //Ecr is struct for communicating to aws ecr api
 type Ecr struct {
-	client           *ecr.ECR
-	listFindings     *ecr.DescribeImageScanFindingsOutput
-	input            *ecr.DescribeImageScanFindingsInput
-	Repositories     [][]string
-	Resion           string
-	OutputFinding    Finding
-	OutputFindings   Findings
-	EtcOutputFinding EtcFinding
+	client             *ecr.ECR
+	listFindings       *ecr.DescribeImageScanFindingsOutput
+	input              *ecr.DescribeImageScanFindingsInput
+	Repositories       [][]string
+	Resion             string
+	OutputScanFinding  ScanFinding
+	OutputScanFindings ScanFindings
+	OutputFinding      Finding
 }
 
-// EtcFinding is struct
-type EtcFinding struct {
+// Finding is struct for Output of DescribeImageScanFinding
+type Finding struct {
 	FindingSeverityCounts        map[string]*int64
 	ImageScanCompletedAt         *time.Time
 	VulnerabilitySourceUpdatedAt *time.Time
 }
 
-// Finding is struct for Vulunerabilities
-type Finding struct {
+// ScanFinding is struct for Vulunerabilities of DescribeImageScanFinding
+type ScanFinding struct {
 	Name        string
 	Severity    string
 	Description string
 	URI         string
-	// FindingSeverityCounts map[string]*int64
 }
 
-// Findings is struct for Vulunerability Findings
-type Findings []Finding
+// ScanFindings is struct for Vulunerability Findings
+type ScanFindings []ScanFinding
 
 // ListFindings is func
-func (e *Ecr) ListFindings() (EtcFinding, Findings, error) {
+func (e *Ecr) ListFindings() (Finding, ScanFindings, error) {
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		Config: aws.Config{
 			Region: aws.String(e.Resion),
@@ -56,17 +55,19 @@ func (e *Ecr) ListFindings() (EtcFinding, Findings, error) {
 			},
 			RepositoryName: aws.String(r[0]),
 		}
-		if err := e.getOutputFindings(); err != nil {
-			return e.EtcOutputFinding, e.OutputFindings, err
+		if err := e.getScanFindings(); err != nil {
+			return e.OutputFinding, e.OutputScanFindings, err
+		}
+		if err := e.getFindings(); err != nil {
+			return e.OutputFinding, e.OutputScanFindings, err
 		}
 	}
-	return e.EtcOutputFinding, e.OutputFindings, nil
+	return e.OutputFinding, e.OutputScanFindings, nil
 }
 
-func (e *Ecr) getOutputFindings() error {
-	var findings Findings
-	var finding Finding
-	// var etcFinding EtcFinding
+func (e *Ecr) getScanFindings() error {
+	var findings ScanFindings
+	var finding ScanFinding
 
 	resp, err := e.client.DescribeImageScanFindings(e.input)
 	if err != nil {
@@ -77,15 +78,14 @@ func (e *Ecr) getOutputFindings() error {
 
 	for _, v := range e.listFindings.ImageScanFindings.Findings {
 		if v.Description != nil {
-			finding = Finding{
+			finding = ScanFinding{
 				Name:        *v.Name,
 				Description: *v.Description,
 				URI:         *v.Uri,
 				Severity:    *v.Severity,
-				// FindingSeverityCounts: e.listFindings.ImageScanFindings.FindingSeverityCounts,
 			}
 		} else {
-			finding = Finding{
+			finding = ScanFinding{
 				Name:        *v.Name,
 				Description: "",
 				URI:         *v.Uri,
@@ -96,11 +96,22 @@ func (e *Ecr) getOutputFindings() error {
 		findings = append(findings, finding)
 	}
 
-	e.EtcOutputFinding = EtcFinding{
+	e.OutputScanFindings = findings
+	return nil
+}
+
+func (e *Ecr) getFindings() error {
+	resp, err := e.client.DescribeImageScanFindings(e.input)
+	if err != nil {
+		log.Fatal(err)
+		return err
+	}
+	e.listFindings = resp
+
+	e.OutputFinding = Finding{
 		e.listFindings.ImageScanFindings.FindingSeverityCounts,
 		e.listFindings.ImageScanFindings.ImageScanCompletedAt,
 		e.listFindings.ImageScanFindings.VulnerabilitySourceUpdatedAt,
 	}
-	e.OutputFindings = findings
 	return nil
 }
