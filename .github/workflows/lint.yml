@@ -1,6 +1,11 @@
-name: Go-CI
+name: Go-Lint
 
-on: [push]
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+    types: [opened, reopened, synchronize]
 
 jobs:
   ci:
@@ -12,5 +17,5 @@ jobs:
         uses: golangci/golangci-lint-action@v2
         with:
           version: latest
-          working-directory: pkg/myecr
+          working-directory: example
 
