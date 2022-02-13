@@ -1,12 +1,12 @@
 package myecr
 
 import (
-	"log"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ecr"
+	log "github.com/sirupsen/logrus"
 )
 
 //Ecr is struct for communicating to aws ecr api
@@ -71,7 +71,10 @@ func (e *Ecr) getScanFindings() error {
 
 	resp, err := e.client.DescribeImageScanFindings(e.input)
 	if err != nil {
-		log.Fatal(err)
+		log.WithFields(log.Fields{
+			"responce",
+			resp,
+		}).Fatal("DescribeImageScanFinding was failed.")
 		return err
 	}
 	e.listFindings = resp
@@ -103,7 +106,10 @@ func (e *Ecr) getScanFindings() error {
 func (e *Ecr) getFindings() error {
 	resp, err := e.client.DescribeImageScanFindings(e.input)
 	if err != nil {
-		log.Fatal(err)
+		log.WithFields(log.Fields{
+			"responce",
+			resp,
+		}).Fatal("DescribeImageScanFinding was failed.")
 		return err
 	}
 	e.listFindings = resp
