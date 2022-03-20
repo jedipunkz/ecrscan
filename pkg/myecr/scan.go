@@ -72,8 +72,7 @@ func (e *Ecr) getScanFindings() error {
 	resp, err := e.client.DescribeImageScanFindings(e.input)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"responce",
-			resp,
+			"responce": resp,
 		}).Fatal("DescribeImageScanFinding was failed.")
 		return err
 	}
@@ -107,8 +106,7 @@ func (e *Ecr) getFindings() error {
 	resp, err := e.client.DescribeImageScanFindings(e.input)
 	if err != nil {
 		log.WithFields(log.Fields{
-			"responce",
-			resp,
+			"responce": resp,
 		}).Fatal("DescribeImageScanFinding was failed.")
 		return err
 	}
